@@ -5,28 +5,15 @@ export interface CaptchaStage {
     title: string;
     type: CaptchaType;
     instructions: string;
+    puzzle: any;
     correctAnswers: any;
-    selectedImages?: any[];
-}
-
-export interface UserAnswer {
-    stageId: number;
-    answer: any;
+    userAnswer: any;
     isCorrect: boolean;
-    time: number;
 }
 
 export interface AppState {
     currentStageId: number;
     stages: CaptchaStage[];
-    userAnswers: UserAnswer[];
-    isStarted: boolean;
+    startTime: Date;
     isCompleted: boolean;
-}
-
-export interface Result {
-    stageId: number;
-    title: string;
-    passed: boolean;
-    details: string;
 }
