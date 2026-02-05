@@ -15,7 +15,7 @@ export const routes: Routes = [
         component: Home
     },
     {
-        path: "challenge",
+        path: "challenges",
         component: Captcha
     },
     {
