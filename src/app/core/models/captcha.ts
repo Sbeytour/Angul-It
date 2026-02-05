@@ -17,7 +17,7 @@ export interface UserAnswer {
 }
 
 export interface AppState {
-    currentSatgeId: number;
+    currentStageId: number;
     stages: CaptchaStage[];
     userAnswers: UserAnswer[];
     isStarted: boolean;
@@ -25,8 +25,8 @@ export interface AppState {
 }
 
 export interface Result {
-  stageId: number;
-  title: string;
-  passed: boolean;
-  details: string;
+    stageId: number;
+    title: string;
+    passed: boolean;
+    details: string;
 }
