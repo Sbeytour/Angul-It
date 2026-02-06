@@ -1,15 +1,19 @@
-import { computed, effect, Injectable, signal } from "@angular/core";
+import { computed, effect, inject, Injectable, PLATFORM_ID, signal } from "@angular/core";
+import { isPlatformBrowser } from "@angular/common";
 import { AppState, CaptchaStage } from "../models/captcha";
 
 @Injectable({ providedIn: 'root' })
 export class CaptchaService {
     private readonly STORAGE_KEY = 'challenge_state'
+    private readonly platformId = inject(PLATFORM_ID);
 
     private appState = signal<AppState>(this.loadState());
 
     constructor() {
         effect(() => {
-            localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.appState()))
+            if (isPlatformBrowser(this.platformId)) {
+                localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.appState()))
+            }
         })
     }
 
@@ -21,9 +25,11 @@ export class CaptchaService {
     readonly isCompleted = computed(() => this.appState().isCompleted)
 
     loadState(): AppState {
-        const saved_state = localStorage.getItem(this.STORAGE_KEY);
-        if (saved_state) {
-            return JSON.parse(saved_state);
+        if (isPlatformBrowser(this.platformId)) {
+            const saved_state = localStorage.getItem(this.STORAGE_KEY);
+            if (saved_state) {
+                return JSON.parse(saved_state);
+            }
         }
 
         return {

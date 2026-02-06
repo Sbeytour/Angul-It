@@ -13,7 +13,21 @@
         @case ('image') {
         <app-image-captcha [stage]="currentStage()"></app-image-captcha>
         }
-
         }
+    </div>
+
+    <div class="navigation">
+        <div class="next">
+            <button (click)="nextChallenge()">
+                Next
+            </button>
+        </div>
+        <div class="previous">
+            <button (click)="previousChallenge()">
+                Previous
+            </button>
+        </div>
+
+
     </div>
 </div>

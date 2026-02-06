@@ -20,4 +20,12 @@ export class Captcha {
   currentStage = this.captchaService.currentStage;
   isCompleted = this.captchaService.isCompleted;
 
+  nextChallenge() {
+
+  }
+
+  previousChallenge() {
+    
+  }
+
 }
