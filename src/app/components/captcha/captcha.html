@@ -1,1 +1,19 @@
-<p>captcha works!</p>
+<div class="captcha-Container">
+    <h2>{{ currentStage().title }}</h2>
+    <p>{{ currentStage().instructions }}</p>
+
+    <div class="stage-holder">
+        @switch (currentStage().type){
+        @case ('operation') {
+        <app-operation-captcha [stage]="currentStage()"></app-operation-captcha>
+        }
+        @case ('text') {
+        <app-text-captcha [stage]="currentStage()"></app-text-captcha>
+        }
+        @case ('image') {
+        <app-image-captcha [stage]="currentStage()"></app-image-captcha>
+        }
+
+        }
+    </div>
+</div>
