@@ -1,11 +1,24 @@
-import { Injectable, signal } from "@angular/core";
+import { computed, effect, Injectable, signal } from "@angular/core";
 import { AppState, CaptchaStage } from "../models/captcha";
 
-Injectable({ providedIn: 'root' })
+@Injectable({ providedIn: 'root' })
 export class CaptchaService {
     private readonly STORAGE_KEY = 'challenge_state'
 
-    public appState = signal<AppState>(this.loadState())
+    private appState = signal<AppState>(this.loadState());
+
+    constructor() {
+        effect(() => {
+            localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.appState()))
+        })
+    }
+
+    readonly currentStage = computed(() => {
+        const state = this.appState();
+        return state.stages[state.currentStageId] || state.stages[0]
+    });
+
+    readonly isCompleted = computed(() => this.appState().isCompleted)
 
     loadState(): AppState {
         const saved_state = localStorage.getItem(this.STORAGE_KEY);
