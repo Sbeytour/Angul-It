@@ -1,12 +1,6 @@
 import { Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
-import { CaptchaStage } from '../../../core/models/captcha';
+import { CaptchaStage, ImageItem } from '../../../core/models/captcha';
 import { CaptchaService } from '../../../core/services/captchaService';
-
-interface ImageItem {
-  id: number;
-  imageUrl: string;
-  isCat: boolean;
-}
 
 @Component({
   selector: 'app-image-captcha',

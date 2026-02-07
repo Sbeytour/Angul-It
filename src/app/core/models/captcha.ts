@@ -17,3 +17,9 @@ export interface AppState {
     startTime: Date;
     isCompleted: boolean;
 }
+
+export interface ImageItem {
+  id: number;
+  imageUrl: string;
+  isCat: boolean;
+}
