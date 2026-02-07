@@ -130,22 +130,17 @@ export class CaptchaService {
     completeChallenge(): boolean {
         const currentId = this.appState().currentStageId;
 
-        // Validate final stage
         this.validateCurrentStage();
 
-        // Get the updated stage after validation
         const currentStage = this.appState().stages[currentId];
 
-        // Check if answer is correct
         if (!currentStage.isCorrect) {
             this.validationError.set('Incorrect answer. Please try again.');
             return false;
         }
 
-        // Clear validation error
         this.validationError.set(null);
 
-        // Mark challenge as completed
         this.appState.update(s => ({
             ...s,
             isCompleted: true

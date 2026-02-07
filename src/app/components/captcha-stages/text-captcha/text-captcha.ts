@@ -39,7 +39,7 @@ export class TextCaptcha {
       }
     });
 
-    // Submit answer on value change (but don't validate yet)
+    // Submit answer on value change but don't validate yet
     this.answerControl.valueChanges
       .pipe(takeUntilDestroyed())
       .subscribe(value => {
