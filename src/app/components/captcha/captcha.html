@@ -1,33 +1,45 @@
-<div class="captcha-Container">
-    <h2>{{ currentStage().title }}</h2>
-    <p>{{ currentStage().instructions }}</p>
+<div class="captcha-container">
+  <div class="progress-section">
+    <span class="stage-label">{{ stageLabel() }}</span>
+    <mat-progress-bar mode="determinate" [value]="progressPercent()"></mat-progress-bar>
+  </div>
 
-    <div class="stage-holder">
-        @switch (currentStage().type){
-        @case ('operation') {
+  <h2>{{ currentStage().title }}</h2>
+  <p class="instructions">{{ currentStage().instructions }}</p>
+
+  <div class="stage-holder">
+    @switch (currentStage().type) {
+      @case ('operation') {
         <app-operation-captcha [stage]="currentStage()"></app-operation-captcha>
-        }
-        @case ('text') {
+      }
+      @case ('text') {
         <app-text-captcha [stage]="currentStage()"></app-text-captcha>
-        }
-        @case ('image') {
+      }
+      @case ('image') {
         <app-image-captcha [stage]="currentStage()"></app-image-captcha>
-        }
-        }
+      }
+    }
+  </div>
+
+  @if (currentStageAnswered()) {
+    <div class="answer-feedback" [class.correct]="currentStageCorrect()" [class.incorrect]="!currentStageCorrect()">
+      <mat-icon>{{ currentStageCorrect() ? 'check_circle' : 'cancel' }}</mat-icon>
+      <span>{{ currentStageCorrect() ? 'Correct!' : 'Incorrect, try again.' }}</span>
     </div>
+  }
 
-    <div class="navigation">
-        <div class="next">
-            <button (click)="nextChallenge()">
-                Next
-            </button>
-        </div>
-        <div class="previous">
-            <button (click)="previousChallenge()">
-                Previous
-            </button>
-        </div>
-
-
-    </div>
+  <div class="navigation">
+    <button mat-stroked-button
+            (click)="previousChallenge()"
+            [disabled]="isFirstStage()">
+      <mat-icon>arrow_back</mat-icon>
+      Previous
+    </button>
+    <button mat-flat-button
+            (click)="nextChallenge()"
+            [disabled]="!currentStageAnswered()">
+      {{ isLastStage() ? 'Finish' : 'Next' }}
+      <mat-icon>{{ isLastStage() ? 'check' : 'arrow_forward' }}</mat-icon>
+    </button>
+  </div>
 </div>

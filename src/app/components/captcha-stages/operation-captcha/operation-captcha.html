@@ -1,1 +1,12 @@
-<p>operation-captcha works!</p>
+<div class="operation-captcha">
+  <div class="puzzle-display">
+    <span class="math-expression">{{ stage().puzzle }}</span>
+    <span class="equals"> = ?</span>
+  </div>
+
+  <mat-form-field appearance="outline" class="answer-field">
+    <mat-label>Your answer</mat-label>
+    <input matInput type="number" [formControl]="answerControl" placeholder="Enter the result" />
+    <mat-error>Answer is required</mat-error>
+  </mat-form-field>
+</div>

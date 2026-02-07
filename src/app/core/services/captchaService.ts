@@ -22,7 +22,105 @@ export class CaptchaService {
         return state.stages[state.currentStageId] || state.stages[0]
     });
 
-    readonly isCompleted = computed(() => this.appState().isCompleted)
+    readonly isCompleted = computed(() => this.appState().isCompleted);
+
+    readonly stages = computed(() => this.appState().stages);
+
+    readonly currentStageId = computed(() => this.appState().currentStageId);
+
+    readonly totalStages = computed(() => this.appState().stages.length);
+
+    readonly startTime = computed(() => this.appState().startTime);
+
+    readonly isFirstStage = computed(() => this.appState().currentStageId === 0);
+
+    readonly isLastStage = computed(() =>
+        this.appState().currentStageId === this.appState().stages.length - 1
+    );
+
+    readonly currentStageAnswered = computed(() =>
+        this.currentStage().userAnswer !== null
+    );
+
+    readonly allStagesAnswered = computed(() =>
+        this.appState().stages.every(s => s.userAnswer !== null)
+    );
+
+    submitAnswer(stageId: number, answer: any): void {
+        this.appState.update(state => {
+            const stages = state.stages.map(stage => {
+                if (stage.id !== stageId) return stage;
+
+                let isCorrect = false;
+                if (stage.type === 'operation') {
+                    isCorrect = Number(answer) === stage.correctAnswers;
+                } else if (stage.type === 'text') {
+                    isCorrect = answer === stage.correctAnswers;
+                } else if (stage.type === 'image') {
+                    const sorted = [...answer].sort();
+                    const correctSorted = [...stage.correctAnswers].sort();
+                    isCorrect = sorted.length === correctSorted.length
+                        && sorted.every((v: number, i: number) => v === correctSorted[i]);
+                }
+
+                return { ...stage, userAnswer: answer, isCorrect };
+            });
+            return { ...state, stages };
+        });
+    }
+
+    nextStage(): boolean {
+        const state = this.appState();
+        if (state.currentStageId < state.stages.length - 1) {
+            this.appState.update(s => ({
+                ...s,
+                currentStageId: s.currentStageId + 1
+            }));
+            return true;
+        }
+        return false;
+    }
+
+    previousStage(): boolean {
+        const state = this.appState();
+        if (state.currentStageId > 0) {
+            this.appState.update(s => ({
+                ...s,
+                currentStageId: s.currentStageId - 1
+            }));
+            return true;
+        }
+        return false;
+    }
+
+    completeChallenge(): void {
+        this.appState.update(s => ({
+            ...s,
+            isCompleted: true
+        }));
+    }
+
+    resetState(): void {
+        this.appState.set({
+            currentStageId: 0,
+            stages: this.generateRandomStages(),
+            startTime: new Date(),
+            isCompleted: false
+        });
+    }
+
+    getTimeTaken(): string {
+        const start = new Date(this.appState().startTime);
+        const now = new Date();
+        const diffMs = now.getTime() - start.getTime();
+        const seconds = Math.floor(diffMs / 1000);
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+        if (minutes > 0) {
+            return `${minutes}m ${remainingSeconds}s`;
+        }
+        return `${seconds}s`;
+    }
 
     loadState(): AppState {
         if (isPlatformBrowser(this.platformId)) {
@@ -103,15 +201,15 @@ export class CaptchaService {
 
     private createImagesStage(id: number): CaptchaStage {
         const cats = [
-            '/public/assets/cats/0.jpg',
-            '/public/assets/cats/1.jpg',
-            '/public/assets/cats/2.jpg'
+            '/assets/cats/0.jpg',
+            '/assets/cats/1.jpg',
+            '/assets/cats/2.jpg'
         ]
 
         const dogs = [
-            '/public/assets/dogs/0.jpg',
-            '/public/assets/dogs/1.jpg',
-            '/public/assets/dogs/2.jpg'
+            '/assets/dogs/0.jpg',
+            '/assets/dogs/1.jpg',
+            '/assets/dogs/2.jpg'
         ]
 
         let images = [];

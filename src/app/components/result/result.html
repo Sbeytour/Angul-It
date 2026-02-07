@@ -1,1 +1,44 @@
-<p>result works!</p>
+<div class="result-container">
+  <h1>Challenge Complete!</h1>
+
+  <div class="summary">
+    <p class="score">
+      {{ totalCorrect() }} / {{ totalStages() }} correct
+    </p>
+    <p class="time">Time taken: {{ timeTaken }}</p>
+  </div>
+
+  @if (allCorrect()) {
+    <div class="verdict passed">
+      <mat-icon>verified</mat-icon>
+      <span>You passed! You are verified as human.</span>
+    </div>
+  } @else {
+    <div class="verdict failed">
+      <mat-icon>error</mat-icon>
+      <span>You did not pass all challenges.</span>
+    </div>
+  }
+
+  <div class="stages-detail">
+    @for (stage of stages(); track stage.id) {
+      <mat-card class="stage-card" [class.correct]="stage.isCorrect" [class.incorrect]="!stage.isCorrect">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>{{ stage.isCorrect ? 'check_circle' : 'cancel' }}</mat-icon>
+            {{ stage.title }}
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <p><strong>Your answer:</strong> {{ stage.type === 'image' ? (stage.userAnswer?.length ?? 0) + ' images selected' : stage.userAnswer }}</p>
+          <p><strong>Result:</strong> {{ stage.isCorrect ? 'Correct' : 'Incorrect' }}</p>
+        </mat-card-content>
+      </mat-card>
+    }
+  </div>
+
+  <button mat-flat-button (click)="restart()" class="restart-button">
+    <mat-icon>refresh</mat-icon>
+    Try Again
+  </button>
+</div>

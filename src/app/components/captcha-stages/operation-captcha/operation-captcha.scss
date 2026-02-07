@@ -1,0 +1,24 @@
+.operation-captcha {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.5rem;
+
+  .puzzle-display {
+    font-size: 2.5rem;
+    font-weight: 500;
+    padding: 1rem 2rem;
+    border-radius: 12px;
+    background: var(--mat-sys-surface-container);
+
+    .equals {
+      color: var(--mat-sys-primary);
+    }
+  }
+
+  .answer-field {
+    width: 200px;
+    text-align: center;
+  }
+}

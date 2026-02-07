@@ -1,0 +1,25 @@
+.text-captcha {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.5rem;
+
+  .puzzle-display {
+    padding: 1rem 2rem;
+    border-radius: 12px;
+    background: var(--mat-sys-surface-container);
+
+    .scrambled-text {
+      font-size: 2.5rem;
+      font-weight: 500;
+      letter-spacing: 0.3rem;
+      font-family: monospace;
+      user-select: none;
+    }
+  }
+
+  .answer-field {
+    width: 250px;
+  }
+}

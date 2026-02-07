@@ -1,1 +1,16 @@
-<p>image-captcha works!</p>
+<div class="image-captcha">
+  <div class="image-grid">
+    @for (image of images(); track image.id) {
+      <div class="image-cell"
+           [class.selected]="isSelected(image.id)"
+           (click)="toggleImage(image.id)">
+        <img [src]="image.imageUrl" [alt]="'Image ' + image.id" />
+        @if (isSelected(image.id)) {
+          <div class="selected-overlay">
+            <span class="check-icon material-icons">check_circle</span>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>
