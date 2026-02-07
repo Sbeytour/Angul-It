@@ -36,6 +36,48 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    position: relative;
+    transition: all 0.3s ease;
+
+    &.stage-completed {
+      filter: blur(1px);
+      opacity: 0.5;
+      pointer-events: none;
+      user-select: none;
+    }
+
+  }
+  .completed-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 10rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    pointer-events: none;
+
+    .completed-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem 2rem;
+      background: var(--mat-sys-primary-container);
+      color: var(--mat-sys-on-primary-container);
+      border-radius: 16px;
+      font: var(--mat-sys-title-large);
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      backdrop-filter: blur(8px);
+
+      mat-icon {
+        font-size: 32px;
+        width: 32px;
+        height: 32px;
+      }
+    }
   }
 
   .answer-feedback {

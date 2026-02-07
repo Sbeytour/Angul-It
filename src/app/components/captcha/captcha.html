@@ -7,24 +7,33 @@
   <h2>{{ currentStage().title }}</h2>
   <p class="instructions">{{ currentStage().instructions }}</p>
 
-  <div class="stage-holder">
+  <div class="stage-holder" [class.stage-completed]="isCurrentStageCompleted()">
     @switch (currentStage().type) {
       @case ('operation') {
-        <app-operation-captcha [stage]="currentStage()"></app-operation-captcha>
+        <app-operation-captcha [stage]="currentStage()" [disabled]="isCurrentStageCompleted()"></app-operation-captcha>
       }
       @case ('text') {
-        <app-text-captcha [stage]="currentStage()"></app-text-captcha>
+        <app-text-captcha [stage]="currentStage()" [disabled]="isCurrentStageCompleted()"></app-text-captcha>
       }
       @case ('image') {
-        <app-image-captcha [stage]="currentStage()"></app-image-captcha>
+        <app-image-captcha [stage]="currentStage()" [disabled]="isCurrentStageCompleted()"></app-image-captcha>
       }
     }
-  </div>
 
-  @if (currentStageAnswered()) {
-    <div class="answer-feedback" [class.correct]="currentStageCorrect()" [class.incorrect]="!currentStageCorrect()">
-      <mat-icon>{{ currentStageCorrect() ? 'check_circle' : 'cancel' }}</mat-icon>
-      <span>{{ currentStageCorrect() ? 'Correct!' : 'Incorrect, try again.' }}</span>
+  </div>
+  @if (isCurrentStageCompleted()) {
+    <div class="completed-overlay">
+      <div class="completed-badge">
+        <mat-icon>check_circle</mat-icon>
+        <span>Completed</span>
+      </div>
+    </div>
+  }
+
+  @if (validationError()) {
+    <div class="answer-feedback incorrect">
+      <mat-icon>error</mat-icon>
+      <span>{{ validationError() }}</span>
     </div>
   }
 

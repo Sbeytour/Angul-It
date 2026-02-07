@@ -1,9 +1,10 @@
-import { Component, effect, inject, input } from '@angular/core';
+import { Component, effect, inject, input, DestroyRef } from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CaptchaStage } from '../../../core/models/captcha';
 import { CaptchaService } from '../../../core/services/captchaService';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-operation-captcha',
@@ -13,6 +14,7 @@ import { CaptchaService } from '../../../core/services/captchaService';
 })
 export class OperationCaptcha {
   stage = input.required<CaptchaStage>();
+  disabled = input<boolean>(false);
   private captchaService = inject(CaptchaService);
 
   answerControl = new FormControl<string>('', {
@@ -21,17 +23,29 @@ export class OperationCaptcha {
   });
 
   constructor() {
+    // Restore previous answer when navigating back
     effect(() => {
       const s = this.stage();
       const value = s.userAnswer !== null ? String(s.userAnswer) : '';
-      this.answerControl.setValue(value);
+      this.answerControl.setValue(value, { emitEvent: false });
     });
-  }
 
-  onAnswerChange(): void {
-    const value = this.answerControl.value;
-    if (value !== '') {
-      this.captchaService.submitAnswer(this.stage().id, value);
-    }
+    // Handle disabled state
+    effect(() => {
+      if (this.disabled()) {
+        this.answerControl.disable();
+      } else {
+        this.answerControl.enable();
+      }
+    });
+
+    // Submit answer on value change (but don't validate yet)
+    this.answerControl.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe(value => {
+        if (value !== '' && !this.disabled()) {
+          this.captchaService.submitAnswer(this.stage().id, value);
+        }
+      });
   }
 }

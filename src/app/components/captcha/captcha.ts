@@ -31,6 +31,8 @@ export class Captcha {
   isLastStage = this.captchaService.isLastStage;
   currentStageAnswered = this.captchaService.currentStageAnswered;
   currentStageCorrect = computed(() => this.currentStage().isCorrect);
+  isCurrentStageCompleted = this.captchaService.isCurrentStageCompleted;
+  validationError = this.captchaService.validationError;
 
   progressPercent = computed(() =>
     ((this.captchaService.currentStageId() + 1) / this.captchaService.totalStages()) * 100
@@ -42,8 +44,10 @@ export class Captcha {
 
   nextChallenge(): void {
     if (this.isLastStage()) {
-      this.captchaService.completeChallenge();
-      this.router.navigate(['/result']);
+      const success = this.captchaService.completeChallenge();
+      if (success) {
+        this.router.navigate(['/result']);
+      }
     } else {
       this.captchaService.nextStage();
     }

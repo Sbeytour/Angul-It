@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, input, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
 import { CaptchaStage } from '../../../core/models/captcha';
 import { CaptchaService } from '../../../core/services/captchaService';
 
@@ -16,6 +16,7 @@ interface ImageItem {
 })
 export class ImageCaptcha {
   stage = input.required<CaptchaStage>();
+  disabled = input<boolean>(false);
   private captchaService = inject(CaptchaService);
 
   selectedIds = signal<Set<number>>(new Set());
@@ -23,6 +24,7 @@ export class ImageCaptcha {
   images = computed<ImageItem[]>(() => this.stage().puzzle as ImageItem[]);
 
   constructor() {
+    // Restore previous answer when navigating back
     effect(() => {
       const s = this.stage();
       if (s.userAnswer !== null && Array.isArray(s.userAnswer)) {
@@ -34,6 +36,8 @@ export class ImageCaptcha {
   }
 
   toggleImage(imageId: number): void {
+    if (this.disabled()) return;
+
     this.selectedIds.update(current => {
       const next = new Set(current);
       if (next.has(imageId)) {
@@ -43,10 +47,14 @@ export class ImageCaptcha {
       }
       return next;
     });
-    this.captchaService.submitAnswer(
-      this.stage().id,
-      Array.from(this.selectedIds())
-    );
+
+    // Submit answer after updating selection (use untracked to prevent circular effect triggers)
+    untracked(() => {
+      const answer = this.selectedIds().size > 0 ? Array.from(this.selectedIds()) : null;
+      if (answer !== null) {
+        this.captchaService.submitAnswer(this.stage().id, answer);
+      }
+    });
   }
 
   isSelected(imageId: number): boolean {

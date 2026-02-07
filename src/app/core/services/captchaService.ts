@@ -8,6 +8,7 @@ export class CaptchaService {
     private readonly platformId = inject(PLATFORM_ID);
 
     private appState = signal<AppState>(this.loadState());
+    validationError = signal<string | null>(null);
 
     constructor() {
         effect(() => {
@@ -46,12 +47,32 @@ export class CaptchaService {
         this.appState().stages.every(s => s.userAnswer !== null)
     );
 
+    readonly isCurrentStageCompleted = computed(() =>
+        this.currentStage().isCorrect
+    );
+
     submitAnswer(stageId: number, answer: any): void {
+        this.validationError.set(null);
         this.appState.update(state => {
             const stages = state.stages.map(stage => {
                 if (stage.id !== stageId) return stage;
+                return { ...stage, userAnswer: answer };
+            });
+            return { ...state, stages };
+        });
+    }
+
+    validateCurrentStage(): void {
+        const currentStageId = this.appState().currentStageId;
+        this.appState.update(state => {
+            const stages = state.stages.map(stage => {
+                if (stage.id !== currentStageId) return stage;
 
                 let isCorrect = false;
+                const answer = stage.userAnswer;
+
+                if (answer === null) return stage;
+
                 if (stage.type === 'operation') {
                     isCorrect = Number(answer) === stage.correctAnswers;
                 } else if (stage.type === 'text') {
@@ -63,15 +84,28 @@ export class CaptchaService {
                         && sorted.every((v: number, i: number) => v === correctSorted[i]);
                 }
 
-                return { ...stage, userAnswer: answer, isCorrect };
+                return { ...stage, isCorrect };
             });
             return { ...state, stages };
         });
     }
 
     nextStage(): boolean {
-        const state = this.appState();
-        if (state.currentStageId < state.stages.length - 1) {
+        const currentId = this.appState().currentStageId;
+
+        this.validateCurrentStage();
+
+        const currentStage = this.appState().stages[currentId];
+
+        if (!currentStage.isCorrect) {
+            this.validationError.set('Incorrect answer. Please try again.');
+            return false;
+        }
+
+        this.validationError.set(null);
+
+        const totalStages = this.appState().stages.length;
+        if (currentId < totalStages - 1) {
             this.appState.update(s => ({
                 ...s,
                 currentStageId: s.currentStageId + 1
@@ -93,14 +127,35 @@ export class CaptchaService {
         return false;
     }
 
-    completeChallenge(): void {
+    completeChallenge(): boolean {
+        const currentId = this.appState().currentStageId;
+
+        // Validate final stage
+        this.validateCurrentStage();
+
+        // Get the updated stage after validation
+        const currentStage = this.appState().stages[currentId];
+
+        // Check if answer is correct
+        if (!currentStage.isCorrect) {
+            this.validationError.set('Incorrect answer. Please try again.');
+            return false;
+        }
+
+        // Clear validation error
+        this.validationError.set(null);
+
+        // Mark challenge as completed
         this.appState.update(s => ({
             ...s,
             isCompleted: true
         }));
+
+        return true;
     }
 
     resetState(): void {
+        this.validationError.set(null);
         this.appState.set({
             currentStageId: 0,
             stages: this.generateRandomStages(),
